@@ -43,4 +43,22 @@ router.post('/user', async (req, res) => {
   }
 });
 
+// Get user details for login
+router.post('/login', async (req, res) => {
+  try {
+    const user = await users.findOne({ $and: [{ email: req.body.email }, { isActive: true }] });
+
+    if (user) {
+      if (user.password === req.body.password) {
+        res.status(200).json({ data: user, msg: "Login Successfully" });
+      } else {
+        res.status(401).json({ data: {}, msg: "Password is wrong. Please enter the correct password" });
+      }
+    } else {
+      res.status(401).json({ data: user, msg: "Unauthorized user. Please register" });
+    }
+  } catch (err) {
+    res.status(500).json({ data: {}, msg: err.message });
+  }
+});
 module.exports = router;
