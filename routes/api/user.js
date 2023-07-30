@@ -4,6 +4,8 @@ const router = express.Router();
 //user model
 const users = require('../../models/user');
 
+
+
 // Create user
 router.post('/user', async (req, res) => {
   const { name, email, password, gender, profession, degree, university, graduation, location, job, jobtype } = req.body;
@@ -28,7 +30,6 @@ router.post('/user', async (req, res) => {
       job,
       jobtype,
       createdAt: Date.now(),
-      notes: [],
       isActive: true,
     });
 
@@ -61,4 +62,51 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ data: {}, msg: err.message });
   }
 });
+
+  // Get user details for profile page
+router.get('/profile', async (req, res) => {
+  const { email } = req.query;
+
+  try {
+    const user = await users.findOne({ email, isActive: true });
+
+    if (user) {
+      return res.status(200).json({ data: user, msg: "User details fetched successfully" });
+    } else {
+      return res.status(404).json({ data: {}, msg: "User not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ data: {}, msg: err.message });
+  }
+});
+
+// Update user profile
+router.put('/updateProfile', async (req, res) => {
+  const { email, gender, profession, degree, university, graduation } = req.body;
+
+  try {
+    const user = await users.findOne({ email, isActive: true });
+
+    if (!user) {
+      return res.status(404).json({ data: {}, msg: "User not found" });
+    }
+
+    user.gender = gender;
+    user.profession = profession;
+    user.degree = degree;
+    user.university = university;
+    user.graduation = graduation;
+
+    const updatedUser = await user.save();
+
+    if (!updatedUser) {
+      throw Error('Something went wrong while updating the user');
+    }
+
+    return res.status(200).json({ data: updatedUser, msg: "User profile updated successfully" });
+  } catch (err) {
+    return res.status(500).json({ data: {}, msg: err.message });
+  }
+});
+
 module.exports = router;
