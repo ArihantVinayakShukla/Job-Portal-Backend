@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -54,6 +54,12 @@ const userSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  jobApplications: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "JobApplication",
+    },
+  ],
 });
 
-module.exports = mongoose.model('users', userSchema);
+module.exports = mongoose.model("users", userSchema);
